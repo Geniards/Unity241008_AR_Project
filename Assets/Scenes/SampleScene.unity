@@ -276,6 +276,55 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &784350573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 784350575}
+  - component: {fileID: 784350574}
+  m_Layer: 0
+  m_Name: MultiImageTracking
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &784350574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784350573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cab3110e76db1b4ca1c331749b25482, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageManager: {fileID: 1514646466}
+  jojoPrefab: {fileID: 4418238063938933453, guid: e56b8d9eeaf663d40b957456bf7149dc, type: 3}
+  enemyPrefab: {fileID: 4238375526948003486, guid: 4e5130f81b01e854aaafa0377799db2a, type: 3}
+  prevPos: {x: 0, y: 0, z: 0}
+  nextPos: {x: 0, y: 0, z: 0}
+--- !u!4 &784350575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784350573}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1409326498
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,8 +415,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4966719baa26e4b0e8231a24d9bd491a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FocusMode: 1
-  m_LightEstimationMode: 0
+  m_FocusMode: -1
+  m_LightEstimationMode: -1
   m_AutoFocus: 1
   m_LightEstimation: 0
   m_FacingDirection: 1
@@ -416,6 +465,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1514646465}
   - component: {fileID: 1514646464}
+  - component: {fileID: 1514646466}
   m_Layer: 0
   m_Name: AR Session Origin
   m_TagString: Untagged
@@ -452,3 +502,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1514646466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514646463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dea56a9eaadd1c439095de4f9a371cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedLibrary: {fileID: 11400000, guid: f76bf64dd5630754b86adfe637ca611e, type: 2}
+  m_MaxNumberOfMovingImages: 5
+  m_TrackedImagePrefab: {fileID: 0}
