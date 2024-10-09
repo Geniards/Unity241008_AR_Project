@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3107140950047580250}
   - component: {fileID: 7687370022375868204}
   - component: {fileID: 950543272164034269}
+  - component: {fileID: 2588086627030176511}
   m_Layer: 0
   m_Name: Jojo
   m_TagString: Untagged
@@ -106,3 +107,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2588086627030176511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4418238063938933453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef289d33c3180bc40b89334f2be1e50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1

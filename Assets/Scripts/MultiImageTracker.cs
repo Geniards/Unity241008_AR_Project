@@ -13,6 +13,7 @@ public class MultiImageTracker : MonoBehaviour
     [SerializeField] private Vector3 prevPos;
     [SerializeField] private Vector3 nextPos;
 
+    GameObject jojo;
 
     private void OnEnable()
     {
@@ -43,8 +44,8 @@ public class MultiImageTracker : MonoBehaviour
             switch (imageName)
             {
                 case "Jojo":
-                    GameObject jojo = Instantiate(jojoPrefab, trackedImage.transform.position, quaternion);
-                    jojo.transform.parent = trackedImage.transform;
+                    jojo = Instantiate(jojoPrefab, trackedImage.transform.position, quaternion);
+                    //jojo.transform.parent = trackedImage.transform;
                     break;
                 case "Enemy":
                     GameObject enemy = Instantiate(enemyPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
@@ -62,15 +63,17 @@ public class MultiImageTracker : MonoBehaviour
 
             //if (prevPos != trackedImage.transform.position)
             {
-               // Debug.Log($"기존 이미지의 이전 위치는 {prevPos}");
-               // Debug.Log($"기존 이미지의 현재 위치는 {trackedImage.transform.position}");
+                Debug.Log($"기존 이미지의 이전 위치는 {prevPos}");
+                Debug.Log($"기존 이미지의 현재 위치는 {trackedImage.transform.position}");
+                Debug.Log($"캐릭터의 현재 위치는 {jojo.transform.position}");
+
             }
 
             // 이미지의 변경사항이 있는 경우 자식으로 있던 게임 오브젝트를 위치와 회전을 갱신
-            trackedImage.transform.GetChild(0).position = trackedImage.transform.position;
-            trackedImage.transform.GetChild(0).rotation = quaternion;
+            jojo.transform.position = new Vector3(jojo.transform.position.x, jojo.transform.position.y,trackedImage.transform.position.z);
+            jojo.transform.rotation = quaternion;
 
-            //prevPos = trackedImage.transform.position;
+            prevPos = trackedImage.transform.position;
         }
 
         // 기존의 이미지가 사라졌을때
