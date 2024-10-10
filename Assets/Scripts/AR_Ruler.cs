@@ -1,141 +1,101 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.UI;
 
 public class AR_Ruler : MonoBehaviour
 {
+    [Header("AR 세팅")]
     [SerializeField] private ARRaycastManager raycastManager;
-    [SerializeField] private ARPlaneManager planeManager;
-    [SerializeField] private GameObject startMarkerPrefab;
-    [SerializeField] private GameObject endMarkerPrefab;
-    [SerializeField] private GameObject focusPointPrefab;
-    [SerializeField] private LineRenderer lineRenderer;
-    [SerializeField] private Button measureButton;
+    private static List<ARRaycastHit> raycastHits = new List<ARRaycastHit>();
+    [SerializeField] private Vector2 screenCenter;
 
-
-    [SerializeField] private GameObject startMarker;
-    [SerializeField] private GameObject endMarker;
-    [SerializeField] private GameObject focusPoint;
-
+    [Header("Ruler 세팅")]
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform pivot;
+    [SerializeField] private Transform rulerPool;
+    [SerializeField] private GameObject rulerObj;
     [SerializeField] private Text distanceText;
-    [SerializeField] private GameObject distanceTextPrefab;
-    [SerializeField] private GameObject distanceTextObject;
+    [SerializeField] private GameObject deleteButtonPrefab;
+    [SerializeField] private Canvas worldSpaceCanvas;
 
-    [SerializeField] private Vector3 startPoint;
-    [SerializeField] private Vector3 endPoint;
-    [SerializeField] private bool isSearching;
-    [SerializeField] private bool firstPointSet;
+    private RulerObj activeRulerObj;
+    private List<RulerObj> rulerObjList = new List<RulerObj>();
+    private bool rulerEnable;
+    private Vector3 lastRulerPos;
+
 
     private void Start()
     {
-        // 버튼 클릭시 마커 설정 및 거리 측정 수행
-        measureButton.onClick.AddListener(OnMeasureButton);
-
-        focusPoint = Instantiate(focusPointPrefab);
+        screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
     }
 
     private void Update()
     {
-        RaycastFromCameraCenter();
-    }
-
-    // 카메라 중앙에서 물체와의 간격 측정 메서드
-    private void RaycastFromCameraCenter()
-    {
-        // 화면 중앙위치
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        if(raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
+        raycastHits.Clear();
+        if (raycastManager.Raycast(screenCenter, raycastHits, TrackableType.PlaneWithinPolygon))
         {
-            Pose hitPose = hits[0].pose;
+            Pose hitPose = raycastHits[0].pose;
+            rulerEnable = true;
+            lastRulerPos = hitPose.position;
+            pivot.rotation = Quaternion.Lerp(pivot.rotation, hitPose.rotation, 0.2f);
 
-            // 초점 오브젝트의 위치를 감지된 평면으로 이동
-            focusPoint.transform.position = hitPose.position;
-            focusPoint.transform.rotation = hitPose.rotation;
+            // 카메라와 평면 사이의 거리 계산
+            float distance = Vector3.Distance(cameraTransform.position, hitPose.position);
+            distanceText.text = $"거리: {distance.ToString("F2")} m";
 
-            // 실시간으로 카메라와 Raycast에 해당하는 평면과의 거리계산
-            float distanceToPlane = Vector3.Distance(Camera.main.transform.position, hitPose.position);
-            distanceText.text = $"해당 목표물과의 거리는 {distanceToPlane:F2}m 입니다.";
+
+            if (activeRulerObj)
+            {
+                activeRulerObj.SetObj(hitPose.position);
+            }
         }
         else
         {
-            distanceText.text = "평면을 감지하지 못했습니다.";
+            rulerEnable = false;
+            Quaternion textRotation = Quaternion.Euler(90f, 0f, 0f);
+            pivot.rotation = Quaternion.Lerp(pivot.rotation, textRotation, 0.5f);
+
+            // 평면을 찾지 못한 경우 거리 텍스트 초기화
+            distanceText.text = "평면을 찾고 있습니다...";
         }
     }
 
-    // 마커 배치 및 거리 측정 메서드
-    private void OnMeasureButton()
+    public void MakeRulerMarker()
     {
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        if (raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
+        if (rulerEnable)
         {
-            Pose hitPose = hits[0].pose;
-
-            if(!firstPointSet)
+            if (activeRulerObj == null)
             {
-                startPoint = hitPose.position;
-                if(startMarker) Destroy(startMarker);
-                startMarker = Instantiate(startMarkerPrefab, startPoint, Quaternion.identity);
-                Debug.Log($"첫번째 마크의 위치 : {startPoint}");
-                // 첫번째 포인트 설정.
-                firstPointSet = true;
+                GameObject obj = Instantiate(rulerObj) as GameObject;
+                obj.transform.SetParent(rulerPool);
+                obj.transform.position = Vector3.zero;
+                obj.transform.localScale = Vector3.one;
+
+                RulerObj rulerObjs = obj.GetComponent<RulerObj>();
+                rulerObjs.mainCamTransform = cameraTransform;
+                rulerObjs.SetInit(lastRulerPos);
+                rulerObjList.Add(rulerObjs);
+                activeRulerObj = rulerObjs;
+
+                GameObject deleteButton = Instantiate(deleteButtonPrefab, worldSpaceCanvas.transform);
+                deleteButton.transform.position = rulerObjs.transform.position + new Vector3(0.01f, 0.01f, 0);
+                deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteRulerMarker(rulerObjs, deleteButton));
             }
             else
             {
-                endPoint = hitPose.position;
-                if(endMarker) Destroy(endMarker);
-                endMarker = Instantiate(endMarkerPrefab, endPoint, Quaternion.identity);
-                Debug.Log($"두번째 마크의 위치 : {endPoint}");
-
-                float distanceToPoint = Vector3.Distance(startPoint, endPoint);
-                distanceText.text = $"두 마커와의 거리는 {distanceToPoint}m 입니다.";
-                Debug.Log($"두 마커와의 거리는 : {distanceToPoint}");
-
-                // 두 마커를 이어주는 직선 그리기
-                DrawLineBetweenPoints();
-
-                // 중간 지점에 거리 표시 텍스트 생성
-                PlaceDistanceText(distanceToPoint);
-
-                // 재측정 가능하게 첫번째포인트 리셋
-                firstPointSet = false;
+                activeRulerObj = null;
             }
         }
     }
 
-    // 두 지점을 이어주는 직선 그리기
-    private void DrawLineBetweenPoints()
+    // RulerObj 삭제 메서드
+    private void DeleteRulerMarker(RulerObj rulerObj, GameObject deleteButton)
     {
-        if (lineRenderer != null)
-        {
-            lineRenderer.positionCount = 2; // 두 지점으로 구성된 직선
-            lineRenderer.SetPosition(0, startPoint); // 첫 번째 점
-            lineRenderer.SetPosition(1, endPoint); // 두 번째 점
-        }
-    }
-
-    // 중간 지점에 거리 표시 텍스트 배치
-    private void PlaceDistanceText(float distance)
-    {
-        Vector3 middlePoint = (startPoint + endPoint) / 2;
-
-        if (distanceTextObject) Destroy(distanceTextObject);
-
-        distanceTextObject = Instantiate(distanceTextPrefab, middlePoint, Quaternion.identity);
-
-        // 텍스트 내용 설정
-        Text textComponent = distanceTextObject.GetComponentInChildren<Text>();
-        if (textComponent != null)
-        {
-            textComponent.text = $"{distance:F2} m";
-        }
-
-        // 카메라를 향하도록 텍스트 회전 (텍스트가 항상 카메라를 바라보도록)
-        distanceTextObject.transform.LookAt(Camera.main.transform);
-        distanceTextObject.transform.Rotate(0, 180, 0); // 텍스트가 반대로 뒤집히지 않도록 180도 회전
+        rulerObjList.Remove(rulerObj);
+        Destroy(rulerObj.gameObject);
+        Destroy(deleteButton);
     }
 }
