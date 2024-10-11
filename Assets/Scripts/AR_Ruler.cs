@@ -18,8 +18,6 @@ public class AR_Ruler : MonoBehaviour
     [SerializeField] private Transform rulerPool;
     [SerializeField] private GameObject rulerObj;
     [SerializeField] private Text distanceText;
-    [SerializeField] private GameObject deleteButtonPrefab;
-    [SerializeField] private Canvas worldSpaceCanvas;
 
     private RulerObj activeRulerObj;
     private List<RulerObj> rulerObjList = new List<RulerObj>();
@@ -79,23 +77,11 @@ public class AR_Ruler : MonoBehaviour
                 rulerObjs.SetInit(lastRulerPos);
                 rulerObjList.Add(rulerObjs);
                 activeRulerObj = rulerObjs;
-
-                GameObject deleteButton = Instantiate(deleteButtonPrefab, worldSpaceCanvas.transform);
-                deleteButton.transform.position = rulerObjs.transform.position + new Vector3(0.01f, 0.01f, 0);
-                deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteRulerMarker(rulerObjs, deleteButton));
             }
             else
             {
                 activeRulerObj = null;
             }
         }
-    }
-
-    // RulerObj 삭제 메서드
-    private void DeleteRulerMarker(RulerObj rulerObj, GameObject deleteButton)
-    {
-        rulerObjList.Remove(rulerObj);
-        Destroy(rulerObj.gameObject);
-        Destroy(deleteButton);
     }
 }
