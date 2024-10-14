@@ -24,6 +24,12 @@ public class AR_Ruler : MonoBehaviour
     private bool rulerEnable;
     private Vector3 lastRulerPos;
 
+    [Header("Angle 세팅")]
+    [SerializeField] private GameObject angleObjPrefab;
+    [SerializeField] private Transform anglePool;
+
+    private AngleObj activeAngleObj;
+    private List<AngleObj> angleObjList = new List<AngleObj>();
 
     private void Start()
     {
@@ -81,6 +87,38 @@ public class AR_Ruler : MonoBehaviour
             else
             {
                 activeRulerObj = null;
+            }
+        }
+    }
+
+    public void MakeAngleMarker()
+    {
+        if (rulerEnable)
+        {
+            if (activeAngleObj == null)  // 첫 번째 마커 생성
+            {
+                Debug.Log("1번 마커 생성");
+                GameObject obj = Instantiate(angleObjPrefab) as GameObject;
+                obj.transform.SetParent(anglePool);
+                obj.transform.position = Vector3.zero;
+                obj.transform.localScale = Vector3.one;
+
+                AngleObj angleObjs = obj.GetComponent<AngleObj>();
+                angleObjs.mainCamTransform = cameraTransform;
+                angleObjs.SetInit(lastRulerPos);  // 첫 번째 마커 위치 설정
+                angleObjList.Add(angleObjs);
+                activeAngleObj = angleObjs;
+            }
+            else if (activeAngleObj.GetMarkerCount() == 1)  // 두 번째 마커 생성
+            {
+                Debug.Log("2번 마커 생성");
+                activeAngleObj.SetMarkerPosition(lastRulerPos);  // 두 번째 마커 위치 설정
+            }
+            else if (activeAngleObj.GetMarkerCount() == 2)  // 세 번째 마커 생성
+            {
+                Debug.Log("3번 마커 생성");
+                activeAngleObj.SetMarkerPosition(lastRulerPos);  // 세 번째 마커 위치 설정
+                activeAngleObj = null;  // 각도 계산 완료 후 활성화 상태 해제
             }
         }
     }
