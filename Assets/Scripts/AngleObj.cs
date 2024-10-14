@@ -11,10 +11,12 @@ public class AngleObj : MonoBehaviour
     [SerializeField] private TextMesh angleTextMesh;
     [SerializeField] private Canvas worldSpaceCanvas;
     [SerializeField] private Button deleteButtonPrefab;
+    //[SerializeField] private AngleSector angleSectorPrefab;
     public Transform mainCamTransform;
 
     private Button deleteButton;
     private int markerIndex = 0;
+    //private AngleSector activeSector;
 
     // 첫 번째 마커 설정
     public void SetInit(Vector3 pos)
@@ -70,6 +72,11 @@ public class AngleObj : MonoBehaviour
         Quaternion lookRotation = Quaternion.LookRotation(directionToCamera);
         angleTextMesh.transform.rotation = lookRotation * Quaternion.Euler(0, 180f, 0);
 
+        //Debug.Log("각도 시각 UI");
+
+        //// 각도 시각 UI 생성
+        //activeSector = Instantiate(angleSectorPrefab, markerList[1].position, Quaternion.identity, this.transform);
+        //activeSector.DrawSector(markerList[1].position, 0.2f, 0, angle);
     }
 
     // 삭제 버튼 생성
@@ -93,6 +100,7 @@ public class AngleObj : MonoBehaviour
     public void DeleteAngleObj()
     {
         Debug.Log("AngleObj 삭제");
+        //if (activeSector != null) activeSector.ClearSector();
         Destroy(lineRenderer1.gameObject);
         Destroy(lineRenderer2.gameObject);
         Destroy(angleTextMesh.gameObject);

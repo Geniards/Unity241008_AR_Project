@@ -324,6 +324,7 @@ MonoBehaviour:
   angleTextMesh: {fileID: 3253279876360311490}
   worldSpaceCanvas: {fileID: 4210170878283609362}
   deleteButtonPrefab: {fileID: 7663992317933514580}
+  angleSectorPrefab: {fileID: 1579638313441248006, guid: 67a3ba641566eb344bd40daa34c79bf6, type: 3}
   mainCamTransform: {fileID: 0}
 --- !u!1 &2961071275403659380
 GameObject:
